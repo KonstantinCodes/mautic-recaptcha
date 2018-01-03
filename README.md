@@ -1,7 +1,7 @@
 # Mautic reCAPTCHA Plugin
 This Plugin brings reCAPTCHA integration to mautic.
 
-BETA version.
+BETA version. Ideas and suggestions are welcome, feel free to create an issue or PR on Github.
 
 Licensed under GNU General Public License v3.0.
 
