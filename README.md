@@ -7,7 +7,7 @@ Licensed under GNU General Public License v3.0.
 
 ## Installation
 1. Move the [MauticRecaptchaBundle](MauticRecaptchaBundle) directory of this repository to the `plugins/` directory.
-2. Clear the cache via console command `php app/console cache:clear --env=prod` (might take a while) OR manually deleting the `app/cache/prod` directory
+2. Clear the cache via console command `php app/console cache:clear --env=prod` (might take a while) *OR* manually delete the `app/cache/prod` directory
 3. Click "Install/Upgrade Plugins" in the Plugins menu.
 
 You should now see a "reCAPTCHA" plugin. Open it to configure site key and site secret.
