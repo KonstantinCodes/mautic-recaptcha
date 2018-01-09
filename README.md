@@ -1,4 +1,4 @@
-# Mautic reCAPTCHA Plugin
+# Mautic reCAPTCHA Plugin [![CircleCI](https://circleci.com/gh/KonstantinCodes/mautic-recaptcha.svg?style=svg)](https://circleci.com/gh/KonstantinCodes/mautic-recaptcha)
 This Plugin brings reCAPTCHA integration to mautic 2.11 and newer.
 
 BETA version. Ideas and suggestions are welcome, feel free to create an issue or PR on Github.
