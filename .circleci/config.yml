@@ -10,3 +10,5 @@ jobs:
       - run: sudo apt install -y libsqlite3-dev zlib1g-dev
       - run: sudo docker-php-ext-install zip
       - run: sudo composer self-update
+      - run: wget --output-document=mautic.tar.gz https://github.com/mautic/mautic/archive/2.12.1.tar.gz && tar -xzf mautic.tar.gz
+      - run cp MauticRecaptchaBundle/ mautic/plugins/
