@@ -10,6 +10,6 @@ jobs:
       - run: sudo apt install -y libsqlite3-dev zlib1g-dev
       - run: sudo composer self-update
       - run: wget --output-document=mautic.tar.gz https://github.com/mautic/mautic/archive/2.12.1.tar.gz && mkdir mautic && tar -xzf mautic.tar.gz --strip 1 --directory=mautic
-      - run: cp -r MauticRecaptchaBundle/ mautic/plugins/ && cd mautic
-      - run: composer install --no-scripts --ignore-platform-reqs
-      - run: bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter MauticRecaptchaBundle
+      - run: cp -r MauticRecaptchaBundle/ mautic/plugins/
+      - run: cd ~/mautic/mautic && composer install --no-scripts --ignore-platform-reqs
+      - run: cd ~/mautic/mautic && bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter MauticRecaptchaBundle
