@@ -5,12 +5,15 @@ BETA version. Ideas and suggestions are welcome, feel free to create an issue or
 
 Licensed under GNU General Public License v3.0.
 
-## Installation
-1. Move the [MauticRecaptchaBundle](MauticRecaptchaBundle) directory of this repository to the `plugins/` directory.
-2. Clear the cache via console command `php app/console cache:clear --env=prod` (might take a while) *OR* manually delete the `app/cache/prod` directory
-3. Click "Install/Upgrade Plugins" in the Plugins menu.
+## Installation via composer
+Execute `composer require koco/mautic-recaptcha-bundle` in the main directory of the mautic installation.
 
-You should now see a "reCAPTCHA" plugin. Open it to configure site key and site secret.
+## Installation via .zip
+1. Download the [master.zip](https://github.com/KonstantinCodes/mautic-recaptcha/archive/master.zip), extract it into the `plugins/` directory and rename the new directory to `MauticRecaptchaBundle`.
+2. Clear the cache via console command `php app/console cache:clear --env=prod` (might take a while) *OR* manually delete the `app/cache/prod` directory.
+
+## Configuration
+Navigate to the Plugins page and click "Install/Upgrade Plugins". You should now see a "reCAPTCHA" plugin. Open it to configure site key and site secret.
 
 ![plugin config](/doc/config.png?raw=true "plugin config")
 
