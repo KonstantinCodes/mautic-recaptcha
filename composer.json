@@ -5,7 +5,7 @@
     "require": {
         "mautic/composer-plugin": "^1.0"
     },
-    "license": "GNU General Public License v3.0",
+    "license": "GPL-3.0-only",
     "authors": [
         {
             "name": "Konstantin Scheumann",
