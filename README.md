@@ -1,4 +1,8 @@
-# Mautic reCAPTCHA Plugin [![CircleCI](https://circleci.com/gh/KonstantinCodes/mautic-recaptcha.svg?style=svg)](https://circleci.com/gh/KonstantinCodes/mautic-recaptcha)
+# Mautic reCAPTCHA Plugin
+
+[![license](https://img.shields.io/circleci/project/github/KonstantinCodes/mautic-recaptcha.svg)](build) [![license](https://img.shields.io/packagist/v/koco/mautic-recaptcha-bundle.svg)](packagist) 
+[![Packagist](https://img.shields.io/packagist/l/koco/mautic-recaptcha-bundle.svg)](license) [![mautic](https://img.shields.io/badge/mautic-%3E%3D%202.11-blue.svg)](mautic)
+
 This Plugin brings reCAPTCHA integration to mautic 2.11 and newer.
 
 BETA version. Ideas and suggestions are welcome, feel free to create an issue or PR on Github.
