@@ -68,7 +68,7 @@ class FormSubscriber extends CommonSubscriber
             'template'       => 'MauticRecaptchaBundle:Integration:recaptcha.html.php',
             'builderOptions' => [
                 'addLeadFieldList' => false,
-                'addIsRequired'    => false,
+                'addIsRequired'    => true,
                 'addDefaultValue'  => false,
                 'addSaveResult'    => true,
             ],
