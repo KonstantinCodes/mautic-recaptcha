@@ -22,6 +22,7 @@ return [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
+                    'mautic.model.factory',
                 ],
             ],
         ],
