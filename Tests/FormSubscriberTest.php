@@ -8,10 +8,12 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
+use PHPUnit_Framework_MockObject_MockBuilder;
 
 class FormSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,9 +55,12 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFormValidate()
     {
-        /**
-         * @param ValidationEvent $validationEvent
-         */
+        /** @var ModelFactory $modelFactory */
+        $modelFactory = $this->getMockBuilder(ModelFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var PHPUnit_Framework_MockObject_MockBuilder|ValidationEvent $validationEvent */
         $validationEvent = $this->getMockBuilder(ValidationEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -68,7 +73,7 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('failedValidation');
 
-        $formSubscriber = new FormSubscriber($this->integrationHelper);
+        $formSubscriber = new FormSubscriber($this->integrationHelper, $modelFactory);
         $formSubscriber->onFormValidate($validationEvent);
     }
 }
