@@ -117,9 +117,11 @@ class FormSubscriber extends CommonSubscriber
 
         $event->failedValidation("reCAPTCHA wasn't successful.");
         $event->getDispatcher()->addListener(LeadEvents::LEAD_POST_SAVE, function (LeadEvent $event) {
-            /** @var LeadModel $model */
-            $model = $this->modelFactory->getModel(self::MODEL_NAME_KEY_LEAD);
-            $model->deleteEntity($event->getLead());
+            if ($event->isNew()){
+                /** @var LeadModel $model */
+                $model = $this->modelFactory->getModel(self::MODEL_NAME_KEY_LEAD);
+                $model->deleteEntity($event->getLead());
+            }
         }, -255);
     }
 }
