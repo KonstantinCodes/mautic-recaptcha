@@ -9,6 +9,7 @@ $action   = $app->getRequest()->get('objectAction');
 $settings = $field['properties'];
 
 $formName    = str_replace('_', '', $formName);
+$hashedFormName = md5($formName);
 $formButtons = (!empty($inForm)) ? $view->render(
     'MauticFormBundle:Builder:actions.html.php',
     [
@@ -28,7 +29,7 @@ HTML;
 
 $jsElement = <<<JSELEMENT
 	<script type="text/javascript">
-    function verifyCallback( response ) {
+    function verifyCallback_{$hashedFormName}( response ) {
         document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
     }
 </script>
@@ -39,7 +40,7 @@ $html = <<<HTML
     {$jsElement}
 	<div $containerAttr>
         {$label}
-	    <div class="g-recaptcha" data-sitekey="{$field['customParameters']['site_key']}" data-callback="verifyCallback"></div>
+	    <div class="g-recaptcha" data-sitekey="{$field['customParameters']['site_key']}" data-callback="verifyCallback_{$hashedFormName}"></div>
         <input $inputAttr type="hidden">
         <span class="mauticform-errormsg" style="display: none;"></span>
     </div>
