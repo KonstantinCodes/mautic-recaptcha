@@ -5,11 +5,11 @@
 
 This Plugin brings reCAPTCHA integration to mautic 2.11 and newer.
 
-BETA version. Ideas and suggestions are welcome, feel free to create an issue or PR on Github.
+Ideas and suggestions are welcome, feel free to create an issue or PR on Github.
 
 Licensed under GNU General Public License v3.0.
 
-## Installation via composer
+## Installation via composer (preferred)
 Execute `composer require koco/mautic-recaptcha-bundle` in the main directory of the mautic installation.
 
 ## Installation via .zip
