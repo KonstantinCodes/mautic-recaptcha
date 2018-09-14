@@ -17,8 +17,12 @@ use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 use PHPUnit_Framework_MockObject_MockBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FormSubscriberTest extends \PHPUnit_Framework_TestCase
+class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
+
+    const RECAPTCHA_TESTING_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+    const RECAPTCHA_TESTING_SECRET_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+
     /**
      * @var RecaptchaIntegration
      */
@@ -28,11 +32,6 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
      * @var IntegrationHelper
      */
     protected $integrationHelper;
-
-    /**
-     * @var ModelFactory
-     */
-    protected $modelFactory;
 
     /**
      * @var EventDispatcherInterface
@@ -49,7 +48,7 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->integration
             ->method('getKeys')
-            ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
+            ->willReturn(['site_key' => self::RECAPTCHA_TESTING_SITE_KEY, 'secret_key' => self::RECAPTCHA_TESTING_SECRET_KEY]);
 
         $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
@@ -58,6 +57,7 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('addListener')
             ->willReturn(true);
 
+
         $this->integrationHelper = $this->getMockBuilder(IntegrationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -65,28 +65,14 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->integrationHelper
             ->method('getIntegrationObject')
             ->willReturn($this->integration);
-
-        $this->modelFactory = $this->getMockBuilder(ModelFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
-    public function testOnFormValidateSuccessful()
+    public function testOnFormValidate()
     {
-        /** @var RecaptchaClient $recaptchaClient */
-        $recaptchaClient = $this->getMockBuilder(RecaptchaClient::class)
+        /** @var ModelFactory $modelFactory */
+        $modelFactory = $this->getMockBuilder(ModelFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $recaptchaClient
-            ->method('verify')
-            ->willReturn(true);
-
-        $formSubscriber = new FormSubscriber(
-            $this->eventDispatcher,
-            $this->integrationHelper,
-            $this->modelFactory,
-            $recaptchaClient
-        );
 
         /** @var PHPUnit_Framework_MockObject_MockBuilder|ValidationEvent $validationEvent */
         $validationEvent = $this->getMockBuilder(ValidationEvent::class)
@@ -100,38 +86,12 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('failedValidation');
 
-        $formSubscriber->onFormValidate($validationEvent);
-    }
-
-    public function testOnFormValidateFailure()
-    {
-        /** @var RecaptchaClient $recaptchaClient */
-        $recaptchaClient = $this->getMockBuilder(RecaptchaClient::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $recaptchaClient
-            ->method('verify')
-            ->willReturn(false);
-
         $formSubscriber = new FormSubscriber(
             $this->eventDispatcher,
             $this->integrationHelper,
-            $this->modelFactory,
-            $recaptchaClient
+            $modelFactory,
+            new RecaptchaClient($this->integrationHelper)
         );
-
-        /** @var PHPUnit_Framework_MockObject_MockBuilder|ValidationEvent $validationEvent */
-        $validationEvent = $this->getMockBuilder(ValidationEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $validationEvent
-            ->method('getValue')
-            ->willReturn('any-value-should-work');
-        $validationEvent
-            ->expects($this->once())
-            ->method('failedValidation');
-
         $formSubscriber->onFormValidate($validationEvent);
     }
 }

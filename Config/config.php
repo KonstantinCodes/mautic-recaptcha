@@ -18,11 +18,19 @@ return [
 
     'services' => [
         'events' => [
-            'mautic.recaptcha.formbundle.subscriber' => [
+            'mautic.recaptcha.event_listener.form_subscriber' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
+                    'event_dispatcher',
                     'mautic.helper.integration',
                     'mautic.model.factory',
+                    'mautic.recaptcha.service.recaptcha_client'
+                ],
+            ],
+            'mautic.recaptcha.service.recaptcha_client' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
+                'arguments' => [
+                    'mautic.helper.integration',
                 ],
             ],
         ],

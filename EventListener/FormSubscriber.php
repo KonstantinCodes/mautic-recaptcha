@@ -8,7 +8,6 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\EventListener;
 
-use GuzzleHttp\Client as GuzzleClient;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -20,6 +19,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\RecaptchaEvents;
+use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class FormSubscriber.
@@ -29,9 +30,19 @@ class FormSubscriber extends CommonSubscriber
     const MODEL_NAME_KEY_LEAD = 'lead.lead';
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var ModelFactory
      */
     protected $modelFactory;
+
+    /**
+     * @var RecaptchaClient
+     */
+    protected $recaptchaClient;
 
     /**
      * @var string
@@ -46,15 +57,24 @@ class FormSubscriber extends CommonSubscriber
     /**
      * FormSubscriber constructor.
      *
+     * @param EventDispatcherInterface $eventDispatcher
      * @param IntegrationHelper $integrationHelper
      * @param ModelFactory $modelFactory
+     * @param RecaptchaClient $recaptchaClient
      */
-    public function __construct(IntegrationHelper $integrationHelper, ModelFactory $modelFactory)
-    {
-        $this->modelFactory = $modelFactory;
-        $integrationObject = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        IntegrationHelper $integrationHelper,
+        ModelFactory $modelFactory,
+        RecaptchaClient $recaptchaClient
+    ){
+        $this->eventDispatcher = $eventDispatcher;
+        $this->modelFactory    = $modelFactory;
+        $this->recaptchaClient = $recaptchaClient;
 
-        $keys            = $integrationObject->getKeys();
+        $integrationObject = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
+        $keys              = $integrationObject->getKeys();
+
         $this->siteKey   = $keys['site_key'];
         $this->secretKey = $keys['secret_key'];
     }
@@ -99,24 +119,13 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormValidate(ValidationEvent $event)
     {
-        $client   = new GuzzleClient(['timeout' => 10]);
-        $response = $client->post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            [
-                'form_params' => [
-                    'secret'   => $this->secretKey,
-                    'response' => $event->getValue(),
-                ],
-            ]
-        );
-
-        $response = json_decode($response->getBody(), true);
-        if (array_key_exists('success', $response) && $response['success'] === true) {
+        if ($this->recaptchaClient->verify($event->getValue())) {
             return;
         }
 
-        $event->failedValidation("reCAPTCHA wasn't successful.");
-        $event->getDispatcher()->addListener(LeadEvents::LEAD_POST_SAVE, function (LeadEvent $event) {
+        $event->failedValidation($this->translator === null ? 'reCAPTCHA was not successful.' : $this->translator->trans('mautic.integration.recaptcha.failure_message'));
+
+        $this->eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, function (LeadEvent $event) {
             if ($event->isNew()){
                 /** @var LeadModel $model */
                 $model = $this->modelFactory->getModel(self::MODEL_NAME_KEY_LEAD);
