@@ -21,10 +21,8 @@ use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\RecaptchaEvents;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-/**
- * Class FormSubscriber.
- */
 class FormSubscriber extends CommonSubscriber
 {
     const MODEL_NAME_KEY_LEAD = 'lead.lead';
@@ -55,8 +53,11 @@ class FormSubscriber extends CommonSubscriber
     protected $secretKey;
 
     /**
-     * FormSubscriber constructor.
-     *
+     * @var boolean
+     */
+    private $recaptchaIsConfigured = false;
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param IntegrationHelper $integrationHelper
      * @param ModelFactory $modelFactory
@@ -67,16 +68,21 @@ class FormSubscriber extends CommonSubscriber
         IntegrationHelper $integrationHelper,
         ModelFactory $modelFactory,
         RecaptchaClient $recaptchaClient
-    ){
+    ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->modelFactory    = $modelFactory;
         $this->recaptchaClient = $recaptchaClient;
+        $integrationObject     = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
+        
+        if ($integrationObject instanceof AbstractIntegration) {
+            $keys            = $integrationObject->getKeys();
+            $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : null;
+            $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : null;
 
-        $integrationObject = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
-        $keys              = $integrationObject->getKeys();
-
-        $this->siteKey   = $keys['site_key'];
-        $this->secretKey = $keys['secret_key'];
+            if ($this->siteKey && $this->secretKey) {
+                $this->recaptchaIsConfigured = true;
+            }
+        }
     }
 
     /**
@@ -95,6 +101,10 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormBuild(FormBuilderEvent $event)
     {
+        if (!$this->recaptchaIsConfigured) {
+            return;
+        }
+
         $event->addFormField('plugin.recaptcha', [
             'label'          => 'mautic.plugin.actions.recaptcha',
             'formType'       => 'recaptcha',
@@ -119,6 +129,10 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormValidate(ValidationEvent $event)
     {
+        if (!$this->recaptchaIsConfigured) {
+            return;
+        }
+
         if ($this->recaptchaClient->verify($event->getValue())) {
             return;
         }
