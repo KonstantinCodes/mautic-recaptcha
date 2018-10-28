@@ -8,9 +8,13 @@ jobs:
     steps:
       - run: sudo apt install -y libsqlite3-dev zlib1g-dev
       - run: sudo composer self-update
-      - run: wget --output-document=mautic.tar.gz https://github.com/mautic/mautic/archive/2.12.1.tar.gz && tar -xzf mautic.tar.gz --strip 1
+      - run: wget --output-document=mautic.tar.gz https://github.com/mautic/mautic/archive/2.14.2.tar.gz && tar -xzf mautic.tar.gz --strip 1
       - checkout:
           path:
             ~/mautic/plugins/MauticRecaptchaBundle
       - run: composer install --no-scripts --ignore-platform-reqs
-      - run: bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter MauticRecaptchaBundle
+      - run: |
+          mkdir -p ~/test-results
+          bin/phpunit --log-junit ~/test-results/phpunit/junit.xml --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter MauticRecaptchaBundle
+      - store_test_results:
+          path: ~/test-results
