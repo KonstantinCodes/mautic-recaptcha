@@ -58,6 +58,11 @@ class FormSubscriber extends CommonSubscriber
     private $recaptchaIsConfigured = false;
 
     /**
+     * @var string|null
+     */
+    private $version;
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param IntegrationHelper $integrationHelper
      * @param ModelFactory $modelFactory
@@ -78,6 +83,7 @@ class FormSubscriber extends CommonSubscriber
             $keys            = $integrationObject->getKeys();
             $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : null;
             $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : null;
+            $this->version   = isset($keys['version']) ? $keys['version'] : null;
 
             if ($this->siteKey && $this->secretKey) {
                 $this->recaptchaIsConfigured = true;
@@ -116,6 +122,7 @@ class FormSubscriber extends CommonSubscriber
                 'addSaveResult'    => true,
             ],
             'site_key' => $this->siteKey,
+            'version'  => $this->version,
         ]);
 
         $event->addValidator('plugin.recaptcha.validator', [
@@ -133,7 +140,7 @@ class FormSubscriber extends CommonSubscriber
             return;
         }
 
-        if ($this->recaptchaClient->verify($event->getValue())) {
+        if ($this->recaptchaClient->verify($event->getValue(), $event->getField())) {
             return;
         }
 

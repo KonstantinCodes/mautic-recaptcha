@@ -32,15 +32,37 @@ $jsElement = <<<JSELEMENT
     function verifyCallback_{$hashedFormName}( response ) {
         document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
     }
+    function onLoad{$hashedFormName}() { 
+        grecaptcha.execute('{$field['customParameters']['site_key']}').then(function(token) {
+            verifyCallback_{$hashedFormName}(token);
+         }); 
+    }
 </script>
+JSELEMENT;
+
+if($field['customParameters']['version'] == 'v2') {
+$jsElement .= <<<JSELEMENT
 <script src='https://www.google.com/recaptcha/api.js'></script>
 JSELEMENT;
+} else {
+$jsElement .= <<<JSELEMENT
+<script src='https://www.google.com/recaptcha/api.js?onload=onLoad{$hashedFormName}&render={$field['customParameters']['site_key']}'></script>
+JSELEMENT;
+}
 
 $html = <<<HTML
     {$jsElement}
 	<div $containerAttr>
         {$label}
-	    <div class="g-recaptcha" data-sitekey="{$field['customParameters']['site_key']}" data-callback="verifyCallback_{$hashedFormName}"></div>
+HTML;
+
+if($field['customParameters']['version'] == 'v2') {
+$html .= <<<HTML
+<div class="g-recaptcha" data-sitekey="{$field['customParameters']['site_key']}" data-callback="verifyCallback_{$hashedFormName}"></div>
+HTML;
+}
+
+$html .= <<<HTML
         <input $inputAttr type="hidden">
         <span class="mauticform-errormsg" style="display: none;"></span>
     </div>

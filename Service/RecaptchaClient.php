@@ -10,6 +10,8 @@ namespace MauticPlugin\MauticRecaptchaBundle\Service;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -55,9 +57,11 @@ class RecaptchaClient extends CommonSubscriber
 
     /**
      * @param string $response
+     * @param Field  $field
+     *
      * @return bool
      */
-    public function verify($response)
+    public function verify($response, Field $field)
     {
         $client   = new GuzzleClient(['timeout' => 10]);
         $response = $client->post(
@@ -70,10 +74,20 @@ class RecaptchaClient extends CommonSubscriber
             ]
         );
 
+
         $response = json_decode($response->getBody(), true);
         if (array_key_exists('success', $response) && $response['success'] === true) {
+
+            $score = (float) ArrayHelper::getValue('score', $response);
+            $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
+            $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
+            if ($score && $scoreValidation && $minScore > $score) {
+                return false;
+            }
+
             return true;
         }
+
 
         return false;
     }

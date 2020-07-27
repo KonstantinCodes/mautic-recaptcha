@@ -8,6 +8,7 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
+use Mautic\FormBundle\Entity\Field;
 use PHPUnit_Framework_MockObject_MockBuilder;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
@@ -25,12 +26,18 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
      */
     private $integration;
 
+    /**
+     * @var Field
+     */
+    private $field;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->integrationHelper = $this->createMock(IntegrationHelper::class);
         $this->integration       = $this->createMock(RecaptchaIntegration::class);
+        $this->field = new Field();
     }
 
     public function testVerifyWhenPluginIsNotInstalled()
@@ -42,7 +49,7 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
         $this->integration->expects($this->never())
             ->method('getKeys');
 
-        $this->createRecaptchaClient()->verify('');
+        $this->createRecaptchaClient()->verify('', $this->field);
     }
 
     public function testVerifyWhenPluginIsNotConfigured()
@@ -55,7 +62,7 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
             ->method('getKeys')
             ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
 
-        $this->createRecaptchaClient()->verify('');
+        $this->createRecaptchaClient()->verify('', $this->field);
     }
 
     /**

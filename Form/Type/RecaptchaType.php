@@ -8,7 +8,9 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -22,6 +24,31 @@ class RecaptchaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
+        $builder->add(
+            'scoreValidation',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.recaptcha.enable.score.validation',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => isset($options['data']['scoreValidation']) ? $options['data']['scoreValidation'] : false,
+            ]
+        );
+        $builder->add(
+            'minScore',
+            NumberType::class,
+            [
+                'label'      => 'mautic.recaptcha.min.score',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'tooltip' => 'mautic.recaptcha.min.score.tooltip',
+                    'data-show-on' => '{"formfield_properties_scoreValidation_1":"checked"}'
+                ],
+                'data'       => isset($options['data']['minScore']) ? $options['data']['minScore'] : 0.8,
+            ]
+        );
+
         $builder->add(
             'buttons',
             'form_buttons',
