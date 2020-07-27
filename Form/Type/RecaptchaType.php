@@ -29,8 +29,11 @@ class RecaptchaType extends AbstractType
             'scoreValidation',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.recaptcha.enable.score.validation',
+                'label'      => 'mautic.recaptcha.score.validation',
                 'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'tooltip' => 'mautic.recaptcha.min.score.tooltip',
+                ],
                 'data'       => isset($options['data']['scoreValidation']) ? $options['data']['scoreValidation'] : false,
             ]
         );
@@ -42,7 +45,6 @@ class RecaptchaType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
-                    'tooltip' => 'mautic.recaptcha.min.score.tooltip',
                     'data-show-on' => '{"formfield_properties_scoreValidation_1":"checked"}'
                 ],
                 'data'       => isset($options['data']['minScore']) ? $options['data']['minScore'] : 0.8,
