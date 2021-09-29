@@ -33,7 +33,7 @@ $jsElement = <<<JSELEMENT
         document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
     }
     function onLoad{$hashedFormName}() { 
-        grecaptcha.execute('{$field['customParameters']['site_key']}').then(function(token) {
+        grecaptcha.execute('{$field['customParameters']['site_key']}', {action: 'form'}).then(function(token) {
             verifyCallback_{$hashedFormName}(token);
          }); 
     }
