@@ -65,7 +65,7 @@ class RecaptchaIntegration extends AbstractIntegration
                         'class'    => 'form-control',
                     ],
                     'required'    => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'data'=> isset($data['version']) ? $data['version'] : 'v2'
                 ]
             );
