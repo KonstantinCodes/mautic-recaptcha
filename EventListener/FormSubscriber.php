@@ -17,13 +17,16 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticRecaptchaBundle\Form\Type\RecaptchaType;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\RecaptchaEvents;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     const MODEL_NAME_KEY_LEAD = 'lead.lead';
 
@@ -31,11 +34,6 @@ class FormSubscriber extends CommonSubscriber
      * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
-
-    /**
-     * @var ModelFactory
-     */
-    protected $modelFactory;
 
     /**
      * @var RecaptchaClient
@@ -58,24 +56,35 @@ class FormSubscriber extends CommonSubscriber
     private $recaptchaIsConfigured = false;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var string|null
      */
     private $version;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
-     * @param IntegrationHelper $integrationHelper
-     * @param ModelFactory $modelFactory
-     * @param RecaptchaClient $recaptchaClient
+     * @param IntegrationHelper        $integrationHelper
+     * @param RecaptchaClient          $recaptchaClient
+     * @param LeadModel                $leadModel
+     * @param TranslatorInterface      $translator
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         IntegrationHelper $integrationHelper,
-        ModelFactory $modelFactory,
-        RecaptchaClient $recaptchaClient
+        RecaptchaClient $recaptchaClient,
+        LeadModel $leadModel,
+        TranslatorInterface $translator
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->modelFactory    = $modelFactory;
         $this->recaptchaClient = $recaptchaClient;
         $integrationObject     = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
         
@@ -89,6 +98,8 @@ class FormSubscriber extends CommonSubscriber
                 $this->recaptchaIsConfigured = true;
             }
         }
+        $this->leadModel = $leadModel;
+        $this->translator = $translator;
     }
 
     /**
@@ -104,6 +115,8 @@ class FormSubscriber extends CommonSubscriber
 
     /**
      * @param FormBuilderEvent $event
+     *
+     * @throws \Mautic\CoreBundle\Exception\BadConfigurationException
      */
     public function onFormBuild(FormBuilderEvent $event)
     {
@@ -113,7 +126,7 @@ class FormSubscriber extends CommonSubscriber
 
         $event->addFormField('plugin.recaptcha', [
             'label'          => 'mautic.plugin.actions.recaptcha',
-            'formType'       => 'recaptcha',
+            'formType'       => RecaptchaType::class,
             'template'       => 'MauticRecaptchaBundle:Integration:recaptcha.html.php',
             'builderOptions' => [
                 'addLeadFieldList' => false,
@@ -148,9 +161,7 @@ class FormSubscriber extends CommonSubscriber
 
         $this->eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, function (LeadEvent $event) {
             if ($event->isNew()){
-                /** @var LeadModel $model */
-                $model = $this->modelFactory->getModel(self::MODEL_NAME_KEY_LEAD);
-                $model->deleteEntity($event->getLead());
+                $this->leadModel->deleteEntity($event->getLead());
             }
         }, -255);
     }

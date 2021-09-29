@@ -23,10 +23,16 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.integration',
-                    'mautic.model.factory',
-                    'mautic.recaptcha.service.recaptcha_client'
+                    'mautic.recaptcha.service.recaptcha_client',
+                    'mautic.lead.model.lead',
+                    'translator'
                 ],
             ],
+        ],
+        'models' => [
+
+        ],
+        'others'=>[
             'mautic.recaptcha.service.recaptcha_client' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
                 'arguments' => [
@@ -34,19 +40,26 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.recaptcha' => [
-                'class' => \MauticPlugin\MauticRecaptchaBundle\Form\Type\RecaptchaType::class,
-                'alias' => 'recaptcha',
-            ],
-        ],
-        'models' => [
-
-        ],
         'integrations' => [
             'mautic.integration.recaptcha' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],

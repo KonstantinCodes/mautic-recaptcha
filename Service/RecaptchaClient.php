@@ -16,7 +16,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class RecaptchaClient extends CommonSubscriber
+class RecaptchaClient
 {
     const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
