@@ -14,7 +14,7 @@ namespace MauticPlugin\MauticRecaptchaBundle\EventListener;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {

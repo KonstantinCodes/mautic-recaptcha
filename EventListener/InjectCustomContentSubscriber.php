@@ -53,14 +53,14 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         }
 
         if ($customContentEvent->getContext() === 'click_counts_headers') {
-            $customContentEvent->addContent( '<td style="display: none">'.$this->translator->trans('mautic.recaptcha.bot_clicks').'</td>');
-            $customContentEvent->addContent( '<td style="display: none">'.$this->translator->trans('mautic.recaptcha.unique_bot_clicks').'</td>');
+            $customContentEvent->addContent( '<td>'.$this->translator->trans('mautic.recaptcha.bot_clicks').'</td>');
+            $customContentEvent->addContent( '<td>'.$this->translator->trans('mautic.recaptcha.unique_bot_clicks').'</td>');
         }
 
         if ($customContentEvent->getContext() === 'click_counts') {
             $logs = $this->redirectLogModel->getRepository()->getLogsRedirectId($customContentEvent->getVars()['redirect_id']) ?? [];
-            $customContentEvent->addContent('<td style="display: none">'.$logs['bot_hits'] ?? 0 .'</td>');
-            $customContentEvent->addContent( '<td style="display: none">'.$logs['unique_bot_hits'] ?? 0 .'</td>');
+            $customContentEvent->addContent('<td>'.$logs['bot_hits'] ?? 0 .'</td>');
+            $customContentEvent->addContent( '<td>'.$logs['unique_bot_hits'] ?? 0 .'</td>');
         }
 
 
