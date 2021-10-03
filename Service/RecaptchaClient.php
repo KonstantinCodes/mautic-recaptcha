@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticRecaptchaBundle\Exception\InvalidRecaptchaException;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
@@ -54,14 +55,7 @@ class RecaptchaClient
         return [];
     }
 
-
-    /**
-     * @param string $response
-     * @param Field  $field
-     *
-     * @return bool
-     */
-    public function verify($response, Field $field)
+    private function validateRecaptchaToken(string $token): array
     {
         $client   = new GuzzleClient(['timeout' => 10]);
         $response = $client->post(
@@ -69,18 +63,40 @@ class RecaptchaClient
             [
                 'form_params' => [
                     'secret'   => $this->secretKey,
-                    'response' => $response,
+                    'response' => $token,
                 ],
             ]
         );
 
 
-        $response = json_decode($response->getBody(), true);
+        return json_decode($response->getBody(), true);
+    }
+
+
+    /**
+     * @param string $response
+     * @param Field  $field
+     *
+     * @return bool
+     */
+    public function verifyFormField($token, Field $field): bool
+    {
+        $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
+        $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
+        try {
+            return $this->verify($token, $scoreValidation, $minScore);
+        } catch (InvalidRecaptchaException $invalidRecaptchaException) {
+            return false;
+        }
+    }
+
+    public function verify($token, bool $scoreValidation = null, float $minScore = null): bool
+    {
+        $response = $this->validateRecaptchaToken($token);
+        $score    = (float) ArrayHelper::getValue('score', $response);
+
         if (array_key_exists('success', $response) && $response['success'] === true) {
 
-            $score = (float) ArrayHelper::getValue('score', $response);
-            $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
-            $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
             if ($score && $scoreValidation && $minScore > $score) {
                 return false;
             }
@@ -88,7 +104,11 @@ class RecaptchaClient
             return true;
         }
 
+        if (array_key_exists('error-codes', $response) && isset($response[0])) {
+            throw new InvalidRecaptchaException($response[0]);
+        }
 
         return false;
     }
+
 }

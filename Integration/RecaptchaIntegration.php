@@ -8,6 +8,8 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
@@ -19,6 +21,10 @@ use Symfony\Component\Form\FormBuilder;
 class RecaptchaIntegration extends AbstractIntegration
 {
     const INTEGRATION_NAME = 'Recaptcha';
+
+    const SPAM_BOT_CHECKER = 'spam_bot_checker';
+
+    const SPAM_BOT_PAGE    = 'spam_bot_page';
 
     public function getName()
     {
@@ -56,8 +62,8 @@ class RecaptchaIntegration extends AbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'v2' => 'mautic.recaptcha.v2',
-                        'v3' => 'mautic.recaptcha.v3',
+                        'mautic.recaptcha.v2' => 'v2',
+                        'mautic.recaptcha.v3' => 'v3',
                     ],
                     'label'      => 'mautic.recaptcha.version',
                     'label_attr' => ['class' => 'control-label'],
@@ -66,7 +72,40 @@ class RecaptchaIntegration extends AbstractIntegration
                     ],
                     'required'    => false,
                     'placeholder' => false,
-                    'data'=> isset($data['version']) ? $data['version'] : 'v2'
+                    'data'=> $data['version'] ?? 'v2'
+                ]
+            );
+
+            $builder->add(
+                self::SPAM_BOT_CHECKER,
+                YesNoButtonGroupType::class,
+                [
+                    'label'       => 'mautic.recaptcha.spam_bot_checker',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class' => 'form-control',
+                        'data-show-on' => '{"integration_details_apiKeys_version":"v3"}'
+                    ],
+                    'required'    => false,
+                    'placeholder' => false,
+                    'data'        => $data[self::SPAM_BOT_CHECKER] ?? false,
+                ]
+            );
+
+            $builder->add(
+                self::SPAM_BOT_PAGE,
+                PageListType::class,
+                [
+                    'label'         => 'mautic.recaptcha.spam_bot_page',
+                    'label_attr'    => ['class' => 'control-label'],
+                    'attr'          => [
+                        'class'            => 'form-control',
+                        'tooltip'          => 'mautic.recaptcha.spam_bot_page.tooltip',
+                        'data-show-on' => '{"integration_details_apiKeys_spam_bot_checker_1":"checked"}'
+                    ],
+                    'multiple'       => false,
+                    'placeholder'    => '',
+                    'published_only' => true,
                 ]
             );
         }

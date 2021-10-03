@@ -49,7 +49,7 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
         $this->integration->expects($this->never())
             ->method('getKeys');
 
-        $this->createRecaptchaClient()->verify('', $this->field);
+        $this->createRecaptchaClient()->verifyFormField('', $this->field);
     }
 
     public function testVerifyWhenPluginIsNotConfigured()
@@ -62,7 +62,7 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
             ->method('getKeys')
             ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
 
-        $this->createRecaptchaClient()->verify('', $this->field);
+        $this->createRecaptchaClient()->verifyFormField('', $this->field);
     }
 
     /**
