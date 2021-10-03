@@ -56,8 +56,8 @@ class RecaptchaIntegration extends AbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'v2' => 'mautic.recaptcha.v2',
-                        'v3' => 'mautic.recaptcha.v3',
+                        'mautic.recaptcha.v2' => 'v2',
+                        'mautic.recaptcha.v3' => 'v3',
                     ],
                     'label'      => 'mautic.recaptcha.version',
                     'label_attr' => ['class' => 'control-label'],
