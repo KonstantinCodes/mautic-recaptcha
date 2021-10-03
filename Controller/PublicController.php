@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\PageBundle\Helper\RedirectHelper;
+use Mautic\PageBundle\Model\RedirectModel;
 use MauticPlugin\MauticRecaptchaBundle\Exception\InvalidRecaptchaException;
 use MauticPlugin\MauticRecaptchaBundle\Model\RedirectLogModel;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
@@ -31,10 +32,9 @@ class PublicController extends AbstractFormController
 
     private RedirectLogModel $redirectLogModel;
 
-    /**
-     * @var Logger
-     */
     private Logger $logger;
+
+    private RedirectModel $redirectModel;
 
     public function initialize(FilterControllerEvent $event)
     {
@@ -42,6 +42,7 @@ class PublicController extends AbstractFormController
         $this->recaptchaClient =  $this->get('mautic.recaptcha.service.recaptcha_client');
         $this->redirectLogModel =  $this->get('mautic.recaptcha.model.redirect_log');
         $this->logger = $this->get('monolog.logger.mautic');
+        $this->redirectModel = $this->get('mautic.page.model.redirect');
     }
 
     public function validateAction($redirectId, $token): JsonResponse
@@ -82,6 +83,8 @@ class PublicController extends AbstractFormController
      */
     public function redirectAction($redirectId): RedirectResponse
     {
-        return $this->redirectHelper->internalRedirectById($redirectId);
+        if ($redirect = $this->redirectModel->getRedirectById($redirectId)) {
+            return $this->redirectHelper->internalRedirect($redirect);
+        }
     }
 }
