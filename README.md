@@ -12,6 +12,8 @@ This only supports reCaptcha v2.
 
 Execute `composer require koco/mautic-recaptcha-bundle:1.*` in the main directory of the mautic installation.
 ### mautic 3 & 4
+Supports reCaptcha v2 and v3.
+
 Execute `composer require koco/mautic-recaptcha-bundle:3.*` in the main directory of the mautic installation.
 
 ## Installation via .zip
