@@ -6,7 +6,7 @@ jobs:
       - image: circleci/php:7.1-cli
     working_directory: ~/mautic
     steps:
-      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
+      - run: sudo apt-get update -y && sudo apt install -y libsqlite3-dev zlib1g-dev
       - run: sudo composer self-update
       - run: wget --output-document=mautic.tar.gz https://github.com/mautic/mautic/archive/2.14.2.tar.gz && tar -xzf mautic.tar.gz --strip 1
       - checkout:
