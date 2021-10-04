@@ -9,15 +9,20 @@
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
-use PHPUnit_Framework_MockObject_MockBuilder;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class IntegrationTest extends \PHPUnit_Framework_TestCase
+class IntegrationTest extends TestCase
 {
 
     const RECAPTCHA_TESTING_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
@@ -38,7 +43,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -69,15 +74,17 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFormValidate()
     {
-        /** @var ModelFactory $modelFactory */
-        $modelFactory = $this->getMockBuilder(ModelFactory::class)
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var PHPUnit_Framework_MockObject_MockBuilder|ValidationEvent $validationEvent */
+        /** @var MockObject|ValidationEvent $validationEvent */
         $validationEvent = $this->getMockBuilder(ValidationEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $validationEvent
             ->method('getValue')
@@ -85,12 +92,19 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $validationEvent
             ->expects($this->never())
             ->method('failedValidation');
+        $validationEvent
+            ->method('getValue')
+            ->willReturn('test');
+        $validationEvent
+            ->method('getField')
+            ->willReturn(new Field());
 
         $formSubscriber = new FormSubscriber(
             $this->eventDispatcher,
             $this->integrationHelper,
-            $modelFactory,
-            new RecaptchaClient($this->integrationHelper)
+            new RecaptchaClient($this->integrationHelper),
+            $leadModel,
+            $translator
         );
         $formSubscriber->onFormValidate($validationEvent);
     }

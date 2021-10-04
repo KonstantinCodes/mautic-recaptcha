@@ -9,7 +9,6 @@
 namespace MauticPlugin\MauticRecaptchaBundle\Service;
 
 use GuzzleHttp\Client as GuzzleClient;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\PluginBundle\Helper\IntegrationHelper;

@@ -9,61 +9,72 @@
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
-use PHPUnit_Framework_MockObject_MockBuilder;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\FormBundle\Event\FormBuilderEvent;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class FormSubscriberTest extends \PHPUnit_Framework_TestCase
+class FormSubscriberTest extends TestCase
 {
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|RecaptchaIntegration
+     * @var MockObject|RecaptchaIntegration
      */
     private $integration;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private $eventDispatcher;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|IntegrationHelper
+     * @var MockObject|IntegrationHelper
      */
     private $integrationHelper;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|ModelFactory
+     * @var MockObject|LeadModel
      */
-    private $modelFactory;
+    private $leadModel;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|RecaptchaClient
+     * @var MockObject|RecaptchaClient
      */
     private $recaptchaClient;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|ValidationEvent
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var MockBuilder|ValidationEvent
      */
     private $validationEvent;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|FormBuilderEvent
+     * @var MockBuilder|FormBuilderEvent
      */
     private $formBuildEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->integration       = $this->createMock(RecaptchaIntegration::class);
         $this->eventDispatcher   = $this->createMock(EventDispatcherInterface::class);
         $this->integrationHelper = $this->createMock(IntegrationHelper::class);
-        $this->modelFactory      = $this->createMock(ModelFactory::class);
+        $this->leadModel         = $this->createMock(LeadModel::class);
         $this->recaptchaClient   = $this->createMock(RecaptchaClient::class);
+        $this->translator        = $this->createMock(TranslatorInterface::class);
         $this->validationEvent   = $this->createMock(ValidationEvent::class);
         $this->formBuildEvent    = $this->createMock(FormBuilderEvent::class);
 
@@ -74,6 +85,14 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->integration
             ->method('getKeys')
             ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
+
+        $this->validationEvent
+            ->method('getValue')
+            ->willReturn('test');
+
+        $this->validationEvent
+            ->method('getField')
+            ->willReturn(new Field());
     }
 
     public function testOnFormValidateSuccessful()
@@ -179,8 +198,9 @@ class FormSubscriberTest extends \PHPUnit_Framework_TestCase
         return new FormSubscriber(
             $this->eventDispatcher,
             $this->integrationHelper,
-            $this->modelFactory,
-            $this->recaptchaClient
+            $this->recaptchaClient,
+            $this->leadModel,
+            $this->translator
         );
     }
 }

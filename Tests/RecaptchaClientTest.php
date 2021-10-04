@@ -9,20 +9,22 @@
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
 use Mautic\FormBundle\Entity\Field;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockBuilder;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 
-class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
+class RecaptchaClientTest extends TestCase
 {
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|IntegrationHelper
+     * @var MockObject|IntegrationHelper
      */
     private $integrationHelper;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockBuilder|RecaptchaIntegration
+     * @var MockObject|RecaptchaIntegration
      */
     private $integration;
 
@@ -31,7 +33,7 @@ class RecaptchaClientTest extends \PHPUnit_Framework_TestCase
      */
     private $field;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
