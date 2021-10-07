@@ -84,7 +84,7 @@ class PublicController extends AbstractFormController
     public function redirectAction($redirectId): RedirectResponse
     {
         if ($redirect = $this->redirectModel->getRedirectById($redirectId)) {
-            return $this->redirectHelper->internalRedirect($redirect);
+            return $this->redirectHelper->trackedRedirect($redirect);
         }
     }
 }

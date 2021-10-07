@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\EventListener;
 
-use Mautic\PageBundle\Event\RedirectEvent;
+use Mautic\PageBundle\Event\RedirectResponseEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticRecaptchaBundle\Service\RedirectLandingPage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,16 +32,15 @@ class RedirectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            PageEvents::ON_REDIRECT => ['onRedirect', 10],
+            PageEvents::ON_REDIRECT_RESPONSE => ['onRedirect', 10],
         ];
     }
 
-    public function onRedirect(RedirectEvent $redirectEvent)
+    public function onRedirect(RedirectResponseEvent $redirectEvent)
     {
         if ($redirectEvent->getChannel() !== 'email') {
             return;
         }
-
         $redirectEvent->stopPropagation();
         $redirectEvent->setContentResponse(new Response($this->redirectLandingPage->getRecaptchaPageContent($redirectEvent->getRedirect()->getRedirectId())));
     }
