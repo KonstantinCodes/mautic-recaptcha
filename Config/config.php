@@ -13,7 +13,16 @@ return [
     'author'      => 'Konstantin Scheumann',
 
     'routes' => [
-
+        'public' => [
+            'mautic_recaptcha_url_redirect' => [
+                'path'       => '/re/r/{redirectId}',
+                'controller' => 'MauticRecaptchaBundle:Public:redirect',
+            ],
+            'mautic_recaptcha_url_validate' => [
+                'path'       => '/re/validate/{redirectId}/{token}',
+                'controller' => 'MauticRecaptchaBundle:Public:validate',
+            ],
+        ]
     ],
 
     'services' => [
@@ -28,15 +37,58 @@ return [
                     'translator'
                 ],
             ],
+            'mautic.recaptcha.subscriber.redirect' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\RedirectSubscriber::class,
+                'arguments' => [
+                    'mautic.recaptcha.redirect.landing.page',
+                ]
+            ],
+            'mautic.recaptcha.subscriber.page.builder' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\BuilderSubscriber::class,
+                'arguments' => [
+                    'translator'
+                ]
+            ],
+            'mautic.recaptcha.subscriber.custom.content' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\InjectCustomContentSubscriber::class,
+                'arguments' => [
+                    'mautic.recaptcha.settings',
+                    'mautic.recaptcha.model.redirect_log',
+                    'translator'
+                ]
+            ],
         ],
         'models' => [
-
+            'mautic.recaptcha.model.redirect_log' => [
+                'class' => \MauticPlugin\MauticRecaptchaBundle\Model\RedirectLogModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead'
+                ]
+            ],
         ],
         'others'=>[
             'mautic.recaptcha.service.recaptcha_client' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
                 'arguments' => [
                     'mautic.helper.integration',
+                ],
+            ],
+            'mautic.recaptcha.settings' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaSettings::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+            ],
+            'mautic.recaptcha.redirect.landing.page' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RedirectLandingPage::class,
+                'arguments' => [
+                    'mautic.recaptcha.settings',
+                    'event_dispatcher',
+                    'mautic.page.model.page',
+                    'router',
+                    'request_stack',
+                    'mautic.helper.templating',
+                    'mautic.recaptcha.service.recaptcha_client',
                 ],
             ],
         ],

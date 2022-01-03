@@ -153,7 +153,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->recaptchaClient->verify($event->getValue(), $event->getField())) {
+        if ($this->recaptchaClient->verifyFormField($event->getValue(), $event->getField())) {
             return;
         }
 
