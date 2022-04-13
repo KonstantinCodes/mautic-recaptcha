@@ -48,7 +48,7 @@ class RecaptchaType extends AbstractType
                     'class' => 'form-control',
                     'data-show-on' => '{"formfield_properties_scoreValidation_1":"checked"}'
                 ],
-                'data'       => isset($options['data']['minScore']) ? $options['data']['minScore'] : 0.8,
+                'data'       => isset($options['data']['minScore']) ? (float) $options['data']['minScore'] : 0.8,
             ]
         );
 
