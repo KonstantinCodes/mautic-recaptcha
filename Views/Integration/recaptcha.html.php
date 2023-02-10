@@ -26,9 +26,18 @@ $label = (!$field['showLabel'])
     : <<<HTML
 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
-
+$onLoad = <<<JSELEMENT
+JSELEMENT;
+if ('v3' == $field['customParameters']['version']) {
+    $onLoad = <<<JSELEMENT
+    setInterval(function () {
+        onLoad{$hashedFormName}();
+    }, 110000);
+JSELEMENT;
+}
 $jsElement = <<<JSELEMENT
 	<script type="text/javascript">
+	{$onLoad}
     function verifyCallback_{$hashedFormName}( response ) {
         document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
     }
